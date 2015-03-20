@@ -20,6 +20,8 @@ app.engine('html', swig.renderFile);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/views');
 
+app.set('port', (process.env.PORT || 5000));
+
 //app.set('view cache', false);
 swig.setDefaults({ cache: false });
 
@@ -136,4 +138,6 @@ app.post('/', function (req, res) {
   }
 });
 
-var server = app.listen(80)
+var server = app.listen(app.get('port'), function() {
+  console.log("Node app is running at localhost:" + app.get('port'));
+});
