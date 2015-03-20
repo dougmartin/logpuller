@@ -21,19 +21,19 @@
        <div class="form-group">
           <label class="col-sm-3 control-label" for="filter_activity">Activity</label>
           <div class="col-sm-9">
-             <input class="form-control" id="filter_activity" name="filter_activity">
+             <input class="form-control" id="filter_activity" name="filter_activity" value="{{ form.filter_activity|addslashes }}">
           </div>
        </div>
        <div class="form-group">
           <label for="start_period" ,="" class="col-sm-3 control-label">Start Period</label>
           <div class="col-sm-9">
-             <input type="datetime-local" class="form-control" id="start_period" name="start_period">
+             <input type="datetime-local" class="form-control" id="start_period" name="start_period" value="{{ form.start_period|addslashes }}">
           </div>
        </div>
        <div class="form-group">
           <label for="end_period" class="col-sm-3 control-label">End Period</label>
           <div class="col-sm-9">
-             <input type="datetime-local" class="form-control" id="end_period" name="end_period">
+             <input type="datetime-local" class="form-control" id="end_period" name="end_period" value="{{ form.end_period|addslashes }}">
           </div>
        </div>
        <div class="form-group">
@@ -193,7 +193,7 @@
        <div class="form-group">
           <label class="col-sm-3 control-label" for="search">Search</label>
           <div class="col-sm-9">
-             <input class="form-control" id="search" name="search">
+             <input class="form-control" id="search" name="search" value="{{ form.search|addslashes }}">
           </div>
        </div>
        <div class="form-group">

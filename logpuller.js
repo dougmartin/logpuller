@@ -35,7 +35,8 @@ app.post('/', function (req, res) {
   var sendResponse = function (error) {
         res.render('index', {
           loggedIn: req.session.loggedIn,
-          error: error || null
+          error: error || null,
+          form: req.body
         });
       },
       sessionRequest = req.session.request;
@@ -118,8 +119,8 @@ app.post('/', function (req, res) {
         return;
       }
       
-      if (parsedBody.iTotalDisplayRecords > 1000) {
-        sendResponse('Sorry, the requested number of records (' + parsedBody.iTotalDisplayRecords + ') is more than the max of 1000.  Please narrow your search.');
+      if (parsedBody.iTotalDisplayRecords > 5000) {
+        sendResponse('Sorry, the requested number of records (' + parsedBody.iTotalDisplayRecords + ') is more than the max of 5000.  Please narrow your search.');
         return;
       }
       
