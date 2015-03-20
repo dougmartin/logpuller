@@ -5,7 +5,8 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     request = require('request'),
     cheerio = require('cheerio'),
-    csv = require('csv');
+    csv = require('csv'),
+    maxRows = 5000;
 
 app.use(session({
   secret: 'no secrets here',
@@ -27,7 +28,8 @@ swig.setDefaults({ cache: false });
 
 app.get('/', function (req, res) {
   res.render('index', {
-    loggedIn: req.session.loggedIn
+    loggedIn: req.session.loggedIn,
+    maxRows: maxRows
   });
 });
 
@@ -119,8 +121,8 @@ app.post('/', function (req, res) {
         return;
       }
       
-      if (parsedBody.iTotalDisplayRecords > 5000) {
-        sendResponse('Sorry, the requested number of records (' + parsedBody.iTotalDisplayRecords + ') is more than the max of 5000.  Please narrow your search.');
+      if (parsedBody.iTotalDisplayRecords > maxRows) {
+        sendResponse('Sorry, the requested number of records (' + parsedBody.iTotalDisplayRecords + ') is more than the max of ' + maxRows + '.  Please narrow your search.');
         return;
       }
       
@@ -131,12 +133,27 @@ app.post('/', function (req, res) {
         }
         
         var parsedBody2 = JSON.parse(body2);
-        parsedBody2.aaData.unshift(['Session', 'Username', 'Application', 'Activity', 'Event', 'Time', 'Parameters', 'Extras', 'Event Value']);
-        csv.stringify(parsedBody2.aaData, function (err, csvData) {
-          res.setHeader('Content-disposition', 'attachment; filename=log.csv');
-          res.setHeader('Content-type', 'text/csv');
-          res.end(csvData);
-        });
+        var header = ['Session', 'Username', 'Application', 'Activity', 'Event', 'Time', 'Parameters', 'Extras', 'Event Value'];
+        
+        if (req.body.format === 'dat') {
+          res.setHeader('Content-disposition', 'attachment; filename=log.dat');
+          res.setHeader('Content-type', 'text/dat');
+          res.write(header.join('\t'));
+          res.write('\n');
+          for (var i = 0; i < parsedBody2.aaData.length; i++) {
+            res.write(parsedBody2.aaData[i].join('\t'));
+            res.write('\n');
+          }
+          res.end();
+        }
+        else {
+          parsedBody2.aaData.unshift(header);
+          csv.stringify(parsedBody2.aaData, function (err, csvData) {
+            res.setHeader('Content-disposition', 'attachment; filename=log.csv');
+            res.setHeader('Content-type', 'text/csv');
+            res.end(csvData);
+          });
+        }
       });
     });
   }

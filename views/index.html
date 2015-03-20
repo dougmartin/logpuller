@@ -197,12 +197,25 @@
           </div>
        </div>
        <div class="form-group">
+          <label class="col-sm-3 control-label" for="format">Format</label>
+          <div class="col-sm-9">
+             <select class="select required form-control" id="format" name="format">
+                <option value="csv">.csv (command delimited)</option>
+                <option value="dat">.dat (tab delimited)</option>
+             </select>
+          </div>
+       </div>
+       <div class="form-group">
           <div class="col-sm-9">
              <input type="submit" name="download" value="Download">
              <input type="submit" name="logout" value="Logout">
           </div>
        </div>
     </form>
+    
+    <p>
+      NOTE: A maximum of {{ maxRows }} rows can be selected for download.
+    </p>
   
   {% else %}
   
