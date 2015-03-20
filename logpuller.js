@@ -114,15 +114,18 @@ app.post('/', function (req, res) {
       
       var parsedBody = JSON.parse(body);
       if (!parsedBody.hasOwnProperty('iTotalDisplayRecords')) {
-        error = 'Could not find total number of records in initial response';
-        sendResponse();
+        sendResponse('Could not find total number of records in initial response');
+        return;
+      }
+      
+      if (parsedBody.iTotalDisplayRecords > 1000) {
+        sendResponse('Sorry, the requested number of records (' + parsedBody.iTotalDisplayRecords + ') is more than the max of 1000.  Please narrow your search.');
         return;
       }
       
       sessionRequest.get(url + parsedBody.iTotalDisplayRecords, function (err, response2, body2) {
         if (err || (response.statusCode != 200)) {
-          error = err || "Unable to load secondary json.logs!"; 
-          sendResponse();
+          sendResponse(err || "Unable to load secondary json.logs!");
           return;
         }
         
