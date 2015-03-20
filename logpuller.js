@@ -42,7 +42,7 @@ app.post('/', function (req, res) {
       
   // keep a request object per session to hold the cookie jar
   if (!sessionRequest) {
-    sessionRequest = request.defaults({
+    req.session.request = sessionRequest = request.defaults({
       jar: true
     });
   }
