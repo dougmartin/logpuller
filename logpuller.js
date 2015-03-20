@@ -116,6 +116,7 @@ app.post('/', function (req, res) {
       }
       
       var parsedBody = JSON.parse(body);
+      
       if (!parsedBody.hasOwnProperty('iTotalDisplayRecords')) {
         sendResponse('Could not find total number of records in initial response');
         return;
@@ -132,8 +133,75 @@ app.post('/', function (req, res) {
           return;
         }
         
-        var parsedBody2 = JSON.parse(body2);
-        var header = ['Session', 'Username', 'Application', 'Activity', 'Event', 'Time', 'Parameters', 'Extras', 'Event Value'];
+        var parsedBody2 = JSON.parse(body2),
+            forEachRow = function (callback) {
+              var result;
+              for (var i = 0; i < parsedBody2.aaData.length; i++) {
+                result = callback(parsedBody2.aaData[i], i);
+                if (result === false) {
+                   break;
+                }
+              }
+              return result;
+            },
+            parseData = function (data) {
+              data = data.replace(/^\s+|\s+$/, '').replace(/=>/g, ':').replace(/\:nil/g, ':null');
+              if (data.length === 0) {
+                return '';
+              }
+              try {
+                return JSON.parse(data);
+              }
+              catch (e) {
+                sendResponse("Unable to parse: " + data);
+                return false;
+              }
+            };
+        
+        // find all the parameters and extras
+        var parameterSet = {},
+            extraSet = {},
+            parameterIndex = 6,
+            extraIndex = 7;
+        if (false === forEachRow(function (row) {
+          row[parameterIndex] = parseData(row[parameterIndex]);
+          if (row[parameterIndex] === false) {
+            return false;
+          }
+          for (var key in row[parameterIndex]) {
+            parameterSet[key] = true;
+          }
+
+          row[extraIndex] = parseData(row[extraIndex]);
+          if (row[extraIndex] === false) {
+            return false;
+          }
+        })) {
+          return;
+        }
+
+        // build the header
+        var header = ['Session', 'Username', 'Application', 'Activity', 'Event', 'Time', 'Event Value'];
+        for (var col in parameterSet) {
+          header.push(col);
+        }
+        for (col in extraSet) {
+          header.push(col);
+        }
+        
+        // unroll the parameters and extras
+        forEachRow(function (row) {
+          // add in the parameters and extras as columns
+          for (var key in parameterSet) {
+            row.push(row[parameterIndex].hasOwnProperty(key) ? row[parameterIndex][key] : '');
+          }
+          for (key in extraSet) {
+            row.push(row[extraIndex].hasOwnProperty(key) ? row[extraIndex][key] : '');
+          }
+          
+          // remove the parameters and extras objects
+          row.splice(parameterIndex, 2);
+        });
         
         if (req.body.format === 'dat') {
           res.setHeader('Content-disposition', 'attachment; filename=log.dat');
