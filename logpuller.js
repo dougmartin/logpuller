@@ -6,7 +6,7 @@ var express = require('express'),
     request = require('request'),
     cheerio = require('cheerio'),
     csv = require('csv'),
-    maxRows = 5000;
+    maxRows = 10000;
 
 app.use(session({
   secret: 'no secrets here',
