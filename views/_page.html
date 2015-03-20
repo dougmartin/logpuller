@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Log Downloader</title>
+    <style>
+      body {
+        font: 14px Arial, Helvetica, sans-serif;
+      }
+      
+      input[type="text"],
+      input[type="password"] {
+        width: 400px;
+      }
+      
+      .alert {
+        margin: 10px;
+        padding: 10px;
+        background-color: #700;
+        color: #fff;
+      }
+      
+      .form-group {
+        margin: 10px 0;
+      }
+      label {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Log Downloader</h1>
+    
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

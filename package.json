@@ -1,0 +1,20 @@
+{
+  "name": "logpuller",
+  "version": "1.0.0",
+  "description": "Pulls down logs from LogManager",
+  "main": "logpuller.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.12.3",
+    "express-session": "^1.10.4",
+    "swig": "^1.4.2",
+    "body-parser": "^1.12.2",
+    "cheerio": "^0.18.0",
+    "request": "^2.53.0",
+    "csv": "^0.4.1"
+  }
+}
