@@ -13,15 +13,20 @@
           <label class="col-sm-3 control-label" for="filter_application">Application</label>
           <div class="col-sm-9">
              <select class="select required form-control" id="filter_application" name="filter_application">
-                <option value=""></option>
-                <option value="Teaching Teamwork">Teaching Teamwork</option>
+                {% for val in form.applications %}
+                <option value="{{ val|addslashes }}">{{ val }}</option>
+                {% endfor %}
              </select>
           </div>
        </div>
        <div class="form-group">
           <label class="col-sm-3 control-label" for="filter_activity">Activity</label>
           <div class="col-sm-9">
-             <input class="form-control" id="filter_activity" name="filter_activity" value="{{ form.filter_activity|addslashes }}">
+             <select class="select required form-control" id="filter_activity" name="filter_activity">
+                {% for val in form.activities %}
+                <option value="{{ val|addslashes }}">{{ val }}</option>
+                {% endfor %}
+             </select>
           </div>
        </div>
        <div class="form-group">
@@ -200,7 +205,7 @@
           <label class="col-sm-3 control-label" for="format">Format</label>
           <div class="col-sm-9">
              <select class="select required form-control" id="format" name="format">
-                <option value="csv">.csv (command delimited)</option>
+                <option value="csv">.csv (comma delimited)</option>
                 <option value="dat">.dat (tab delimited)</option>
              </select>
           </div>

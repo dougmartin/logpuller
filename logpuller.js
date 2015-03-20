@@ -27,10 +27,45 @@ app.set('port', (process.env.PORT || 5000));
 swig.setDefaults({ cache: false });
 
 app.get('/', function (req, res) {
-  res.render('index', {
-    loggedIn: req.session.loggedIn,
-    maxRows: maxRows
-  });
+  var sendResponse = function (form) {
+        res.render('index', {
+          loggedIn: req.session.loggedIn,
+          maxRows: maxRows,
+          form: form || {}
+        });
+      },
+      sessionRequest = req.session.request;
+      
+  // keep a request object per session to hold the cookie jar
+  if (!sessionRequest) {
+    req.session.request = sessionRequest = request.defaults({
+      jar: true
+    });
+  }      
+      
+  if (req.session.loggedIn) {
+    sessionRequest.get('http://teaching-teamwork-log-manager.herokuapp.com/logs', function (err, response, body) {
+      var $ = cheerio.load(body),
+          applications = [],
+          activities = [];
+      if (response.statusCode == 200) {
+        $('select#filter_application > option').each(function () {
+          applications.push($(this).val());
+        });
+        $('select#filter_activity > option').each(function () {
+          activities.push($(this).val());
+        });
+      }
+      
+      sendResponse({
+        applications: applications,
+        activities: activities
+      });
+    });
+  }
+  else {
+    sendResponse();
+  }
 });
 
 app.post('/', function (req, res) {
@@ -63,15 +98,15 @@ app.post('/', function (req, res) {
         return;
       }
       
-      $ = cheerio.load(body);
-      var params = {
-        utf8: $('input[name="utf8"]').val(),
-        authenticity_token: $('input[name="authenticity_token"]').val(),
-        'user[email]': req.body.email,
-        'user[password]': req.body.password,
-        'user[remember_me]': "0",
-        commit: 'Sign in'
-      };
+      var $ = cheerio.load(body),
+          params = {
+            utf8: $('input[name="utf8"]').val(),
+            authenticity_token: $('input[name="authenticity_token"]').val(),
+            'user[email]': req.body.email,
+            'user[password]': req.body.password,
+            'user[remember_me]': "0",
+            commit: 'Sign in'
+          };
       sessionRequest
         .post({url: 'http://teaching-teamwork-log-manager.herokuapp.com/users/sign_in', form: params}, function (err, response2, body2) {
           if (response2.statusCode == 302) {
