@@ -6,6 +6,8 @@ var express = require('express'),
     request = require('request'),
     cheerio = require('cheerio'),
     csv = require('csv'),
+    getRemoteFormData,
+    server,
     maxRows = 10000;
 
 app.use(session({
@@ -26,6 +28,34 @@ app.set('port', (process.env.PORT || 5000));
 //app.set('view cache', false);
 swig.setDefaults({ cache: false });
 
+getRemoteFormData = function (req, cb) {
+  req.session.request.get('http://teaching-teamwork-log-manager.herokuapp.com/logs', function (err, response, body) {
+    var $ = cheerio.load(body),
+        applications = [],
+        activities = [],
+        noCaseSort = function (a, b) {
+          return a.toLowerCase().localeCompare(b.toLowerCase());
+        };
+        
+    if (response.statusCode == 200) {
+      $('select#filter_application > option').each(function () {
+        applications.push($(this).val());
+      });
+      $('select#filter_activity > option').each(function () {
+        activities.push($(this).val());
+      });
+    }
+    
+    applications.sort(noCaseSort);
+    activities.sort(noCaseSort);
+    
+    cb({
+      applications: applications,
+      activities: activities
+    });
+  });  
+};
+
 app.get('/', function (req, res) {
   var sendResponse = function (form) {
         res.render('index', {
@@ -44,24 +74,7 @@ app.get('/', function (req, res) {
   }      
       
   if (req.session.loggedIn) {
-    sessionRequest.get('http://teaching-teamwork-log-manager.herokuapp.com/logs', function (err, response, body) {
-      var $ = cheerio.load(body),
-          applications = [],
-          activities = [];
-      if (response.statusCode == 200) {
-        $('select#filter_application > option').each(function () {
-          applications.push($(this).val());
-        });
-        $('select#filter_activity > option').each(function () {
-          activities.push($(this).val());
-        });
-      }
-      
-      sendResponse({
-        applications: applications,
-        activities: activities
-      });
-    });
+    getRemoteFormData(req, sendResponse);
   }
   else {
     sendResponse();
@@ -70,11 +83,24 @@ app.get('/', function (req, res) {
 
 app.post('/', function (req, res) {
   var sendResponse = function (error) {
-        res.render('index', {
-          loggedIn: req.session.loggedIn,
-          error: error || null,
-          form: req.body
-        });
+        if (error) {
+          getRemoteFormData(req, function (formData) {
+            req.body.applications = formData.applications;
+            req.body.activities = formData.activities;
+            
+            res.render('index', {
+              loggedIn: req.session.loggedIn,
+              error: error || null,
+              form: req.body
+            });
+          });
+        }
+        else {
+          res.render('index', {
+            loggedIn: req.session.loggedIn,
+            form: req.body
+          });
+        }
       },
       sessionRequest = req.session.request;
       
@@ -211,6 +237,9 @@ app.post('/', function (req, res) {
           if (row[extraIndex] === false) {
             return false;
           }
+          for (var key in row[extraIndex]) {
+            extraSet[key] = true;
+          }
         })) {
           return;
         }
@@ -262,6 +291,6 @@ app.post('/', function (req, res) {
   }
 });
 
-var server = app.listen(app.get('port'), function() {
+server = app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'));
 });

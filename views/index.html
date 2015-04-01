@@ -14,7 +14,7 @@
           <div class="col-sm-9">
              <select class="select required form-control" id="filter_application" name="filter_application">
                 {% for val in form.applications %}
-                <option value="{{ val|addslashes }}">{{ val }}</option>
+                <option value="{{ val|addslashes }}"{% if val == form.filter_application %} selected{% endif %}>{{ val }}</option>
                 {% endfor %}
              </select>
           </div>
@@ -24,7 +24,7 @@
           <div class="col-sm-9">
              <select class="select required form-control" id="filter_activity" name="filter_activity">
                 {% for val in form.activities %}
-                <option value="{{ val|addslashes }}">{{ val }}</option>
+                <option value="{{ val|addslashes }}"{% if val == form.filter_activity %} selected{% endif %}>{{ val }}</option>
                 {% endfor %}
              </select>
           </div>
