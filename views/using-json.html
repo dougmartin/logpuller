@@ -1,0 +1,36 @@
+{% extends '_page.html' %}
+
+{% block content %}
+
+  {% if error %}
+    <div class='alert'>{{ error }}</div>
+  {% endif %}
+    
+  <form accept-charset="UTF-8" action="/using-json" method="post">
+     <div class="form-group">
+        <label class="col-sm-3 control-label" for="json">JSON</label>
+        <br>
+        <textarea name="json" id="json" class="form-control top-buffer" rows="20" style="width: 800px">{{ form.json }}</textarea>        
+     </div>
+     <div class="form-group">
+        <label class="col-sm-3 control-label" for="format">Format</label>
+        <div class="col-sm-9">
+           <select class="select required form-control" id="format" name="format">
+              <option value="csv">.csv (comma delimited)</option>
+              <option value="dat">.dat (tab delimited)</option>
+           </select>
+        </div>
+     </div>
+     <div class="form-group">
+        <div class="col-sm-9">
+           <input type="submit" name="download" value="Download">
+           <input type="submit" name="logout" value="Logout">
+        </div>
+     </div>
+  </form>
+  
+  <script>
+    document.getElementById("json").focus();
+  </script>
+  
+{% endblock %}

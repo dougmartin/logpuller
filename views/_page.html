@@ -30,6 +30,17 @@
   <body>
     <h1>Log Downloader</h1>
     
+    {% if loggedIn %}
+    <h2>How do you want to select the data to download?</h2>
+  
+    <p>
+      <ul>
+        <li><a href='using-form-fields'>Using Form Fields</a></li>
+        <li><a href='using-json'>Using JSON</a></li>
+      </ul>
+    </p>
+    {% endif %}
+    
     <div id="content">
       {% block content %}{% endblock %}
     </div>
